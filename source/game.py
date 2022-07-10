@@ -4,6 +4,7 @@ Created on Sun Jul  3 17:38:22 2022
 
 @author: angel
 """
+# 콜로세움
 def colosseum():
     pygame.init()
     screen_width = 1000 
@@ -192,9 +193,10 @@ def colosseum():
         screen.blit(img_blue,(img_blue_x,img_blue_y))
         screen.blit(img_red, (img_x,img_y))
         pygame.display.update()
-        
+
+# 복도        
 def slype():
-    
+    # 기사 
     def knight_room():
         pygame.init()
         background = pygame.image.load("knight_room.png")
@@ -213,6 +215,7 @@ def slype():
             screen.blit(background, (0, 0))
             pygame.display.update()
         return a     
+    # 상인
     def dealer_room():
         pygame.init()
         background = pygame.image.load("dealer_room.png")
@@ -340,6 +343,7 @@ def slype():
         screen.blit(player, (player_x_pos, player_y_pos))
         pygame.display.update()
         
+# 방        
 def room():
     def mentor_room():
         pygame.init()
