@@ -12,4 +12,4 @@
 ### 반란 3-1 ~ 3-5 까지 세모 왕국 병사와의 싸움
 ### 3-6 ~ 3-10 까지 세모 왕국의 기사와의 싸움
 
-캡쳐이미지 (https://github.com/kangjups/colosseum/blob/main/capture/202207101046.png)
+[캡쳐이미지] (https://github.com/kangjups/colosseum/blob/main/capture/202207101046.png)
