@@ -95,6 +95,14 @@ def colosseum():
     # 플레이어 점수
     score = 0
     
+    #음악
+    background_sound = pygame.mixer.Sound("light.wav")
+    background_sound.set_volume(0.4)
+    background_sound.play(-1)
+    
+    wing = pygame.mixer.Sound("wing.wav")
+    bim = pygame.mixer.Sound("bim.wav")
+    
     running = True
     #- 1초 == 70 dt
     while running:
@@ -160,6 +168,7 @@ def colosseum():
                     
                     
                 if event.key == pygame.K_j :
+                    wing.play()
                     if direction == 0 :
                         weapon_x_pos = player_x_pos + 20
                         weapon_y_pos = player_y_pos + 40
@@ -205,6 +214,7 @@ def colosseum():
                 m_weapon_x_pos = monster_x_pos + 50
                 m_weapon_y_pos = monster_y_pos + 40
                 m_weapons.append([m_weapon_x_pos, m_weapon_y_pos])
+                bim.play()
                 if player_x_pos > monster_x_pos :
                     direction2 = 1
                 else :
@@ -227,11 +237,11 @@ def colosseum():
         if direction2 == 1:    
             m_weapons = [ [w[0] + m_weapon_speed, w[1]] for w in m_weapons]
             m_weapons = [ [w[0], w[1]] for w in m_weapons if w[0] < monster_x_pos + 500]
-
+          
         if direction2 == 2:    
             m_weapons = [ [w[0] - m_weapon_speed, w[1]] for w in m_weapons]
             m_weapons = [ [w[0], w[1]] for w in m_weapons if w[0] > monster_x_pos - 500]
-        
+
         # 몬스터 hp
         img_red = font.render(str(red_HP),True,WHITE) # 레드
         img_x = monster_x_pos + 40
