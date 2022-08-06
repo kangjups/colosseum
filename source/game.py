@@ -27,6 +27,7 @@ def colosseum():
     player_y_pos = 350
     to_x = 0
     to_y = 0
+    dash_time = 40
     
     # 몬스터
     monster_size = monster.get_rect().size
@@ -38,7 +39,6 @@ def colosseum():
     
     # 몬스터 스킬
     m_weapon = pygame.image.load("monster_dog_weapon.png")
-    
     m_weapon_size = m_weapon.get_rect().size
     m_weapon_width = m_weapon_size[0]
     m_weapon_height = m_weapon_size[1]
@@ -46,13 +46,15 @@ def colosseum():
     m_weapon_speed = 5
     m_weapon_damage = 8
     m_time = 40
-
+    m_time_boom = 40
+    m_time_boom2 = 40
     boom = pygame.image.load("boom_rl.png")
     boom_size = m_weapon.get_rect().size
     boom_width = m_weapon_size[0]
     boom_height = m_weapon_size[1]
     booms = []
     boom_damage = 18
+    m_w_time = 0
     
     # 총알
     weapon = pygame.image.load("weapon.png")
@@ -65,7 +67,6 @@ def colosseum():
     weapons_down = []
     weapon_speed = 10
     weapon_damage = 5
-    m_w_time = 0
     
     # 문
     door_size = door.get_rect().size
@@ -107,6 +108,7 @@ def colosseum():
     background_sound = pygame.mixer.Sound("light.wav")
     background_sound.set_volume(0.3)
     background_sound.play(-1)
+    
     wing = pygame.mixer.Sound("wing.wav")
     bim = pygame.mixer.Sound("bim.wav")
     
@@ -125,6 +127,9 @@ def colosseum():
         p_m += 1
         m_time += 1
         m_w_time += 1
+        m_time_boom += 1
+        m_time_boom2 += 1
+        dash_time += 1
         
         # 캐릭터 충돌
         player_rect = player.get_rect()
@@ -144,13 +149,13 @@ def colosseum():
         player_y_pos += to_y
         
         if monster_x_pos <= player_x_pos and not player_rect.colliderect(monster_rect):
-            monster_x_pos += 1
+            monster_x_pos += 2
         if monster_x_pos >= player_x_pos and not player_rect.colliderect(monster_rect):
-            monster_x_pos -= 1  
+            monster_x_pos -= 2  
         if monster_y_pos <= player_y_pos and not player_rect.colliderect(monster_rect):
-            monster_y_pos += 0.5
+            monster_y_pos += 1
         if monster_y_pos >= player_y_pos and not player_rect.colliderect(monster_rect):
-            monster_y_pos -= 0.5
+            monster_y_pos -= 1
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -169,7 +174,19 @@ def colosseum():
                 if event.key == pygame.K_s: 
                     to_y = 6
                     direction = 3
+                if event.key == pygame.K_SPACE and dash_time > 100:
+                    if direction == 1 : 
+                        player_x_pos = player_x_pos - 140
+                    if direction == 0 : 
+                        player_x_pos = player_x_pos + 140 + 40
+                    if direction == 2 : 
+                        player_y_pos = player_y_pos - 140
+                    if direction == 3 : 
+                        player_y_pos = player_y_pos + 140 + 40
+                    dash_time = 0
                     
+                if event.key == pygame.K_SPACE and  event.key == pygame.K_d:
+                    player_x_pos = player_x_pos + 140    
                 if event.key == pygame.K_j :
                     wing.play()
                     if direction == 0 :
@@ -224,17 +241,31 @@ def colosseum():
                 monster = pygame.image.load("monster_dog.png")
       
         
-        #if m_time > 100 :
-         #   boomx = random.randint(100,900)
-          #  boomy = random.randint(100,800)
-           # booms.append([boomx,boomy])
-            #if m_time > 150:
-             #   boom = pygame.image.load("boom.png")
-              #  for i in range(13):
-               #     boom_x_pos = i*80 
-                #    boom_y_pos = boomy
-                 #   booms.append(boom_x_pos,boom_y_pos)
-               # m_time = 0
+        if m_time_boom > 220 and m_time_boom2 > 220:
+            boom_random = random.randint(1,2)
+            if boom_random == 1:
+                boom = pygame.image.load("boom_rl.png")
+            if boom_random == 2:
+                boom = pygame.image.load("boom_ud.png")
+            booms.clear()
+            boomx = random.randint(120,880)
+            boomy = random.randint(120,780)
+            booms.append([boomx,boomy])
+            m_time_boom = 0
+        if m_time_boom2 > 280:
+            if boom_random == 1:
+                boom = pygame.image.load("boom.png")
+                for i in range(14):
+                    boom_x_pos = i*80
+                    boom_y_pos = boomy
+                    booms.append([boom_x_pos,boom_y_pos])
+            if boom_random == 2:
+                boom = pygame.image.load("boom2.png")
+                for i in range(14):
+                    boom_x_pos = boomx
+                    boom_y_pos = i*80
+                    booms.append([boom_x_pos,boom_y_pos])
+            m_time_boom2 = 0
                 
         if direction2 == 1:    
             m_weapons = [ [w[0] + m_weapon_speed, w[1]] for w in m_weapons]
@@ -250,7 +281,7 @@ def colosseum():
         if m_w_time > 20 :
             i += 1
             if i == 1: 
-                m_weapon_ = pygame.transform.rotate(m_weapon,45)
+                m_weapon_ = pygame.transform.rotate(m_weapon,90)
             if i == 2:
                 m_weapon = pygame.transform.rotate(m_weapon,-90)
                 i = 0
@@ -386,17 +417,21 @@ def colosseum():
         screen.blit(background, (0, 0))
         screen.blit(door, (250, 0))
         
-        #for boom_x_pos, boom_y_pos in booms:
-         #   screen.blit(boom, (boom_x_pos, boom_y_pos))
+        for boom_x_pos, boom_y_pos in booms:
+            screen.blit(boom, (boom_x_pos, boom_y_pos))
             
         for m_weapon_x_pos, m_weapon_y_pos in m_weapons:
             screen.blit(m_weapon, (m_weapon_x_pos, m_weapon_y_pos))
+            
         for weapon_x_pos, weapon_y_pos in weapons:
             screen.blit(weapon, (weapon_x_pos, weapon_y_pos))
+            
         for weapon_x_pos, weapon_y_pos in weapons_lt:
             screen.blit(weapon, (weapon_x_pos, weapon_y_pos))
+            
         for weapon_x_pos, weapon_y_pos in weapons_up:
             screen.blit(weapon, (weapon_x_pos, weapon_y_pos))
+            
         for weapon_x_pos, weapon_y_pos in weapons_down:
             screen.blit(weapon, (weapon_x_pos, weapon_y_pos))
             
