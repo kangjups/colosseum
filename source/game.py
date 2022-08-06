@@ -4,6 +4,9 @@ Created on Sun Jul  3 17:38:22 2022
 
 @author: angel
 """
+import pygame
+import random
+
 def colosseum():
     pygame.init()
     screen_width = 1000 
@@ -12,7 +15,8 @@ def colosseum():
     pygame.display.set_caption("colosseum")
     background = pygame.image.load("colosseum.png")
     player = pygame.image.load("player.png")
-    monster = pygame.image.load("monster.png")
+    monster = pygame.image.load("monster_dog.png")
+    #player = pygame.transform.rotate(player,30)
     door = pygame.image.load("door.png")
     
     # 플레이어
@@ -23,7 +27,6 @@ def colosseum():
     player_y_pos = 350
     to_x = 0
     to_y = 0
-    dash_time = 40
     
     # 몬스터
     monster_size = monster.get_rect().size
@@ -34,16 +37,16 @@ def colosseum():
     monster_damage = 10
     
     # 몬스터 스킬
-    m_weapon = pygame.image.load("m_weapon.png")
+    m_weapon = pygame.image.load("monster_dog_weapon.png")
+    
     m_weapon_size = m_weapon.get_rect().size
     m_weapon_width = m_weapon_size[0]
     m_weapon_height = m_weapon_size[1]
     m_weapons = []
-    m_weapon_speed = 6
+    m_weapon_speed = 5
     m_weapon_damage = 8
     m_time = 40
-    m_time_boom = 40
-    m_time_boom2 = 40
+
     boom = pygame.image.load("boom_rl.png")
     boom_size = m_weapon.get_rect().size
     boom_width = m_weapon_size[0]
@@ -62,6 +65,7 @@ def colosseum():
     weapons_down = []
     weapon_speed = 10
     weapon_damage = 5
+    m_w_time = 0
     
     # 문
     door_size = door.get_rect().size
@@ -94,14 +98,15 @@ def colosseum():
     direction = 0
     # 몬스터 스킬 방향
     direction2 = 0
+    # 몬스터 스킬 방향 2
+    direction3 = 0
     # 플레이어 점수
     score = 0
-    
+    i = 0
     #음악
     background_sound = pygame.mixer.Sound("light.wav")
-    background_sound.set_volume(0.1)
+    background_sound.set_volume(0.3)
     background_sound.play(-1)
-    
     wing = pygame.mixer.Sound("wing.wav")
     bim = pygame.mixer.Sound("bim.wav")
     
@@ -119,9 +124,7 @@ def colosseum():
         
         p_m += 1
         m_time += 1
-        m_time_boom += 1
-        m_time_boom2 += 1
-        dash_time += 1
+        m_w_time += 1
         
         # 캐릭터 충돌
         player_rect = player.get_rect()
@@ -141,13 +144,13 @@ def colosseum():
         player_y_pos += to_y
         
         if monster_x_pos <= player_x_pos and not player_rect.colliderect(monster_rect):
-            monster_x_pos += 2
+            monster_x_pos += 1
         if monster_x_pos >= player_x_pos and not player_rect.colliderect(monster_rect):
-            monster_x_pos -= 2  
+            monster_x_pos -= 1  
         if monster_y_pos <= player_y_pos and not player_rect.colliderect(monster_rect):
-            monster_y_pos += 1
+            monster_y_pos += 0.5
         if monster_y_pos >= player_y_pos and not player_rect.colliderect(monster_rect):
-            monster_y_pos -= 1
+            monster_y_pos -= 0.5
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -166,23 +169,6 @@ def colosseum():
                 if event.key == pygame.K_s: 
                     to_y = 6
                     direction = 3
-                
-                if event.key == pygame.K_q: 
-                    print(player_x_pos,player_y_pos)
-                    
-                if event.key == pygame.K_SPACE and dash_time > 100:
-                    if direction == 1 : 
-                        player_x_pos = player_x_pos - 140
-                    if direction == 0 : 
-                        player_x_pos = player_x_pos + 140 + 40
-                    if direction == 2 : 
-                        player_y_pos = player_y_pos - 140
-                    if direction == 3 : 
-                        player_y_pos = player_y_pos + 140 + 40
-                    dash_time = 0
-                    
-                if event.key == pygame.K_SPACE and  event.key == pygame.K_d:
-                    player_x_pos = player_x_pos + 140
                     
                 if event.key == pygame.K_j :
                     wing.play()
@@ -203,15 +189,12 @@ def colosseum():
                         weapon_y_pos = player_y_pos + 40
                         weapons_down.append([weapon_x_pos, weapon_y_pos])
                     
-                if event.key == pygame.K_f and player_rect.colliderect(door_rect): 
-                    slype()
-                    #running = False
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_a or event.key == pygame.K_d:
                     to_x = 0
                 if event.key == pygame.K_w or event.key == pygame.K_s:
                     to_y = 0
-              
+        
         # 플레이어 스킬 
         weapons = [ [w[0] + weapon_speed, w[1]] for w in weapons]
         weapons = [ [w[0], w[1]] for w in weapons if w[0] < player_x_pos + 40 + 60 ]
@@ -227,7 +210,7 @@ def colosseum():
         
         # 몬스터 스킬
         if m_time > 200 :
-            monster = pygame.image.load("monster_2.png")
+            monster = pygame.image.load("monster_dog2.png")
             if m_time > 250:
                 m_weapon_x_pos = monster_x_pos + 50
                 m_weapon_y_pos = monster_y_pos + 40
@@ -238,44 +221,42 @@ def colosseum():
                 else :
                     direction2 = 2
                 m_time = 0
-                monster = pygame.image.load("monster.png")
+                monster = pygame.image.load("monster_dog.png")
+      
+        
+        #if m_time > 100 :
+         #   boomx = random.randint(100,900)
+          #  boomy = random.randint(100,800)
+           # booms.append([boomx,boomy])
+            #if m_time > 150:
+             #   boom = pygame.image.load("boom.png")
+              #  for i in range(13):
+               #     boom_x_pos = i*80 
+                #    boom_y_pos = boomy
+                 #   booms.append(boom_x_pos,boom_y_pos)
+               # m_time = 0
                 
-        # 폭탄 폭발        
-        if m_time_boom > 220 and m_time_boom2 > 220:
-            boom_random = random.randint(1,2)
-            if boom_random == 1:
-                boom = pygame.image.load("boom_rl.png")
-            if boom_random == 2:
-                boom = pygame.image.load("boom_ud.png")
-            booms.clear()
-            boomx = random.randint(120,880)
-            boomy = random.randint(120,780)
-            booms.append([boomx,boomy])
-            m_time_boom = 0
-        if m_time_boom2 > 280:
-            if boom_random == 1:
-                boom = pygame.image.load("boom.png")
-                for i in range(14):
-                    boom_x_pos = i*80
-                    boom_y_pos = boomy
-                    booms.append([boom_x_pos,boom_y_pos])
-            if boom_random == 2:
-                boom = pygame.image.load("boom2.png")
-                for i in range(14):
-                    boom_x_pos = boomx
-                    boom_y_pos = i*80
-                    booms.append([boom_x_pos,boom_y_pos])
-            m_time_boom2 = 0
-            
-            
         if direction2 == 1:    
             m_weapons = [ [w[0] + m_weapon_speed, w[1]] for w in m_weapons]
             m_weapons = [ [w[0], w[1]] for w in m_weapons if w[0] < monster_x_pos + 500]
-          
+            #if :
+             #   m_weapon = pygame.transform.rotate(m_weapon,15)
+            
         if direction2 == 2:    
             m_weapons = [ [w[0] - m_weapon_speed, w[1]] for w in m_weapons]
             m_weapons = [ [w[0], w[1]] for w in m_weapons if w[0] > monster_x_pos - 500]
-
+            #m_weapon = pygame.transform.rotate(m_weapon,15)
+            
+        if m_w_time > 20 :
+            i += 1
+            if i == 1: 
+                m_weapon_ = pygame.transform.rotate(m_weapon,45)
+            if i == 2:
+                m_weapon = pygame.transform.rotate(m_weapon,-90)
+                i = 0
+            m_w_time = 0
+            
+            
         # 몬스터 hp
         img_red = font.render(str(red_HP),True,WHITE) # 레드
         img_x = monster_x_pos + 40
@@ -405,8 +386,8 @@ def colosseum():
         screen.blit(background, (0, 0))
         screen.blit(door, (250, 0))
         
-        for boom_x_pos, boom_y_pos in booms:
-            screen.blit(boom, (boom_x_pos, boom_y_pos))
+        #for boom_x_pos, boom_y_pos in booms:
+         #   screen.blit(boom, (boom_x_pos, boom_y_pos))
             
         for m_weapon_x_pos, m_weapon_y_pos in m_weapons:
             screen.blit(m_weapon, (m_weapon_x_pos, m_weapon_y_pos))
@@ -421,279 +402,12 @@ def colosseum():
             
         screen.blit(monster, (monster_x_pos, monster_y_pos))
         screen.blit(player, (player_x_pos, player_y_pos))
-            
         screen.blit(img_blue,(img_blue_x,img_blue_y))
         screen.blit(img_red, (img_x,img_y))
         screen.blit(timer,(0,0))
         screen.blit(scores,(100,0))
         #screen.blit(score, (10, 10))
         pygame.display.update()
-    return score    
-def slype():
-    
-    def knight_room():
-        pygame.init()
-        background = pygame.image.load("knight_room.png")
-        pygame.display.set_caption("knight_room")
-        pygame.mouse.get_pos()
-        clock = pygame.time.Clock()
-        running = True
-        while running:
-            dt = clock.tick(60)
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False 
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    a = 4
-                    running = False
-            screen.blit(background, (0, 0))
-            pygame.display.update()
-        return a     
-    def dealer_room():
-        pygame.init()
-        background = pygame.image.load("dealer_room.png")
-        pygame.display.set_caption("dealer_room")
-        clock = pygame.time.Clock()
-        running = True
-        while running:
-            dt = clock.tick(60)
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False 
-            screen.blit(background, (0, 0))
-            pygame.display.update()
-            
-    pygame.init()
-    screen_width = 900 
-    screen_height = 300
-    screen = pygame.display.set_mode((screen_width, screen_height))
-    pygame.display.set_caption("slype")
-    player = pygame.image.load("player.png")
-    background = pygame.image.load("slype.png")
-    knight = pygame.image.load("knight.png")
-    dealer = pygame.image.load("dealer.png")
-    door = pygame.image.load("door.png")
-    
-    # 플레이어
-    player_size = player.get_rect().size
-    player_width = player_size[0]
-    player_height = player_size[1]
-    player_x_pos = 400
-    player_y_pos = 160
-    to_x = 0
-    to_y = 0
-    
-    # 기사
-    knight_size = knight.get_rect().size
-    knight_width = knight_size[0]
-    knight_height = knight_size[1]
-    
-    # 상인
-    dealer_size = dealer.get_rect().size
-    dealer_width = dealer_size[0]
-    dealer_height = dealer_size[1]    
-    
-    # 문
-    door_size = door.get_rect().size
-    door_width = door_size[0]
-    door_height = door_size[1]
-    
-    clock = pygame.time.Clock()
-    game_font = pygame.font.Font(None, 40)
-    score = 0
-    running = True
-    #-
-    while running:
-        dt = clock.tick(60)
-        
-        screen_width = 900 
-        screen_height = 300
-        screen = pygame.display.set_mode((screen_width, screen_height))
-        
-        # 캐릭터 이동        
-        player_x_pos += to_x
-        player_y_pos += to_y
-        
-        if player_x_pos <= 40:
-            player_x_pos = 40
-        elif player_x_pos >= 760:
-            player_x_pos = 760
-        if player_y_pos <= 40:
-            player_y_pos = 40
-        elif player_y_pos >= 160:
-            player_y_pos = 160
-        
-        # 캐릭터 충돌
-        player_rect = player.get_rect()
-        player_rect.left = player_x_pos
-        player_rect.top = player_y_pos
-        
-        knight_rect = knight.get_rect()
-        knight_rect.left = 740
-        knight_rect.top = 140
-        
-        dealer_rect = dealer.get_rect()
-        dealer_rect.left = 55
-        dealer_rect.top = 55
-        
-        door_rect = door.get_rect()
-        door_rect.left = 400
-        door_rect.top = 255
-        
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False 
 
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_a: 
-                    to_x = -5
-                if event.key == pygame.K_d: 
-                    to_x = 5
-                if event.key == pygame.K_w: 
-                    to_y = -5
-                if event.key == pygame.K_s: 
-                    to_y = 5
-                if event.key == pygame.K_q: 
-                    print(player_x_pos,player_y_pos)
-                if event.key == pygame.K_f and player_rect.colliderect(door_rect): 
-                    running = False
-                if event.key == pygame.K_f and player_rect.colliderect(knight_rect): 
-                    a = knight_room()
-                    if a == 4:
-                        score = colosseum()
-                if event.key == pygame.K_f and player_rect.colliderect(dealer_rect): 
-                    dealer_room()
-                
-                    
-            if event.type == pygame.KEYUP:
-                if event.key == pygame.K_a or event.key == pygame.K_d:
-                    to_x = 0
-                if event.key == pygame.K_w or event.key == pygame.K_s:
-                    to_y = 0
-                    
-        scores = game_font.render(str(int(score)), True, (255,255,255))
-        
-        screen.blit(background, (0, 0))
-        screen.blit(knight, (740, 140))
-        screen.blit(dealer, (55, 55))
-        screen.blit(door, (400, 255))
-        screen.blit(player, (player_x_pos, player_y_pos))
-        screen.blit(scores,(0,0))
-        pygame.display.update()
-        
-def room():
-    def mentor_room():
-        pygame.init()
-        background = pygame.image.load("mentor_room.png")
-        pygame.display.set_caption("mentor_room")
-        clock = pygame.time.Clock()
-        running = True
-        while running:
-            dt = clock.tick(60)
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False 
-            screen.blit(background, (0, 0))
-            pygame.display.update()
-            
-    pygame.init()
-    screen_width = 500 
-    screen_height = 500
-    screen = pygame.display.set_mode((screen_width, screen_height))
-    pygame.display.set_caption("room")
-    background = pygame.image.load("room.png")
-    player = pygame.image.load("player.png")
-    mentor = pygame.image.load("mentor.png")
-    door = pygame.image.load("door.png")
-    
-    # 플레이어
-    player_size = player.get_rect().size
-    player_width = player_size[0]
-    player_height = player_size[1]
-    player_x_pos = 350
-    player_y_pos = 350
-    to_x = 0
-    to_y = 0
-    
-    # 스승
-    mentor_size = mentor.get_rect().size
-    mentor_width = mentor_size[0]
-    mentor_height = mentor_size[1]
-    
-    # 문
-    door_size = door.get_rect().size
-    door_width = door_size[0]
-    door_height = door_size[1]
-    
-    clock = pygame.time.Clock()
-    running = True
-    #-
-    while running:
-        dt = clock.tick(60)
-        screen_width = 500 
-        screen_height = 500
-        screen = pygame.display.set_mode((screen_width, screen_height))
-       
-        # 캐릭터 이동        
-        player_x_pos += to_x
-        player_y_pos += to_y
-        
-        if player_x_pos <= 45:
-            player_x_pos = 45
-        elif player_x_pos >= 360:
-            player_x_pos = 360
-        if player_y_pos <= 40:
-            player_y_pos = 40
-        elif player_y_pos >= 365:
-            player_y_pos = 365
-        
-        # 캐릭터 충돌
-        player_rect = player.get_rect()
-        player_rect.left = player_x_pos
-        player_rect.top = player_y_pos
-        
-        mentor_rect = mentor.get_rect()
-        mentor_rect.left = 65
-        mentor_rect.top = 65
-        
-        door_rect = door.get_rect()
-        door_rect.left = 250
-        door_rect.top = 15
-        
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False 
-
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_a: 
-                    to_x = -5
-                if event.key == pygame.K_d: 
-                    to_x = 5
-                if event.key == pygame.K_w: 
-                    to_y = -5
-                if event.key == pygame.K_s: 
-                    to_y = 5
-                if event.key == pygame.K_q: 
-                    print(player_x_pos,player_y_pos)
-                    
-                if event.key == pygame.K_f and player_rect.colliderect(door_rect): 
-                    slype()
-                if event.key == pygame.K_f and player_rect.colliderect(mentor_rect): 
-                    mentor_room()
-            if event.type == pygame.KEYUP:
-                if event.key == pygame.K_a or event.key == pygame.K_d:
-                    to_x = 0
-                if event.key == pygame.K_w or event.key == pygame.K_s:
-                    to_y = 0
-                    
-        screen.blit(background, (0, 0))
-        screen.blit(door, (250, 15))
-        screen.blit(mentor,(65,65))
-        screen.blit(player, (player_x_pos, player_y_pos))
-        pygame.display.update()
-        
-import pygame
-import random
-room()
-#colosseum()
+colosseum()
 pygame.quit()
