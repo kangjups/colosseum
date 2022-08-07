@@ -6,6 +6,7 @@ Created on Sun Jul  3 17:38:22 2022
 """
 import pygame
 import random
+import test1
 
 def colosseum():
     pygame.init()
@@ -174,6 +175,7 @@ def colosseum():
                 if event.key == pygame.K_s: 
                     to_y = 6
                     direction = 3
+                    
                 if event.key == pygame.K_SPACE and dash_time > 100:
                     if direction == 1 : 
                         player_x_pos = player_x_pos - 140
@@ -444,5 +446,80 @@ def colosseum():
         #screen.blit(score, (10, 10))
         pygame.display.update()
 
-colosseum()
+#colosseum()
+
+class pygame_total:
+    def __init__(self,imgfile,x,y,screen):
+        self.img = pygame.image.load(imgfile)
+        self.x = x
+        self.y = y
+        self.screen = screen
+   
+    def draw(self):
+        self.screen.blit(self.img,(self.x,self.y))
+    
+    def move(self,x,y):
+        self.x = x 
+        self.y = y
+# 플레이어 클래스    
+class player:
+    def __init__(self,name,imgfile,playerx,playery,screen):
+        self.name = name
+        self.img = pygame.image.load(imgfile)
+        self.playerx = playerx
+        self.playery = playery
+        self.screen = screen
+        
+    def draw(self):
+        self.screen.blit(self.img, (self.playerx, self.playery))
+
+# 화면 클래스
+class background:
+    def __init__(self,imgfile,x,y,screen):
+        self.img = pygame.image.load(imgfile)
+        self.x = x
+        self.y = y
+        self.screen = screen
+    
+    def draw(self):
+        self.screen.blit(self.img, (self.x, self.y))
+
+test1.myprint()
+print(test1.add(10,3))
+
+pygame.init()
+screen_width = 1000 
+screen_height = 800
+screen = pygame.display.set_mode((screen_width, screen_height))    
+back = pygame_total("colosseum.png",0,0,screen)
+man = pygame_total("player.png",100,100,screen)
+running = True
+    #- 1초 == 70 dt
+while running:
+    #dt = clock.tick(60)
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_a: 
+                man.move(man.x-10,man.y)
+            if event.key == pygame.K_d: 
+                man.move(man.x + 10,man.y)
+            if event.key == pygame.K_w: 
+                man.move(man.x,man.y-10)
+            if event.key == pygame.K_s: 
+                man.move(man.x,man.y + 10)
+                 
+    #screen.blit(background, (0, 0))
+    #screen.blit(man.img,(man.playerx,man.playery))
+    back.draw()
+    man.draw()
+    pygame.display.update()
 pygame.quit()
+
+
+
+
+
+
